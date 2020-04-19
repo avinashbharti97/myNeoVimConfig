@@ -13,8 +13,9 @@ Plug 'bling/vim-airline'
 Plug 'scrooloose/nerdcommenter'
 Plug 'jiangmiao/auto-pairs'
 Plug 'Yggdroot/indentLine'
-Plug 'sheerun/vim-polyglot'
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
+Plug 'mattn/emmet-vim',
+Plug 'wakatime/vim-wakatime'
 " call PlugInstall to install new plugins
 call plug#end()
 
@@ -34,9 +35,10 @@ set nobackup
 set noswapfile
 set nowrap
 set number
+set clipboard+=unnamedplus
 " preferences
 inoremap jk <ESC>
-let mapleader = "\<Space>"
+let mapleader = ","
 set pastetoggle=<F2>
 " j/k will move virtual lines (lines that wrap)
 noremap <silent> <expr> j (v:count == 0 ? 'gj' : 'j')
@@ -49,7 +51,9 @@ vnoremap > >gv
 " act more like C or D because by default, Y yanks the current line (i.e. the
 " same as yy).
 noremap Y y$
-" navigate split screens easily
+vnoremap <leader>y "+y
+
+"navigate split screens easily
 nmap <silent> <c-k> :wincmd k<CR>
 nmap <silent> <c-j> :wincmd j<CR>
 nmap <silent> <c-h> :wincmd h<CR>
@@ -108,3 +112,6 @@ let g:coc_global_extensions = [
   \ 'coc-prettier', 
   \ 'coc-json', 
   \ ]
+
+let g:user_emmet_leader_key=','
+let g:python_host_prog='/usr/bin/python'
