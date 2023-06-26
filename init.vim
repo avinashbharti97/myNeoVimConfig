@@ -28,12 +28,15 @@ Plug 'tpope/vim-fugitive'
 Plug 'xolox/vim-misc'
 Plug 'xolox/vim-notes'
 Plug 'folke/tokyonight.nvim', { 'branch': 'main' }
+Plug 'navarasu/onedark.nvim'
 Plug 'airblade/vim-gitgutter'
 Plug 'dhruvasagar/vim-table-mode'
+Plug 'catppuccin/nvim', { 'as': 'catppuccin' }
+Plug 'nvim-tree/nvim-web-devicons' " OPTIONAL: for file icons
 
 " for tabs
 Plug 'romgrk/barbar.nvim'
-
+"Plug 'akinsho/bufferline.nvim', { 'tag': '*' }
 " call PlugInstall to install new plugins
 call plug#end()
 
@@ -117,8 +120,8 @@ endfunction
 "
 autocmd BufRead * call SyncTree()
 
-
-
+"bufferline airline issue
+let g:airline#extensions#tabline#enabled = 0
 
 " plugin settings
 
@@ -139,6 +142,18 @@ autocmd InsertLeave,CompleteDone * if pumvisible() == 0 | pclose | endif
  set termguicolors
 set background=dark
 "colorscheme tokyonight-night
+"colorscheme catppuccin-mocha
+"
+let g:onedark_config = {
+  \ 'style': 'dark',
+  \ 'toggle_style_key': '<leader>ts',
+  \ 'ending_tildes': v:true,
+  \ 'diagnostics': {
+    \ 'darker': v:false,
+    \ 'background': v:false,
+  \ },
+\ }
+colorscheme onedark
 
 "NERDTree
 " How can I close vim if the only window left open is a NERDTree?
@@ -179,8 +194,17 @@ let g:coc_global_extensions = [
   \ 'coc-prettier', 
   \ 'coc-json',
   \ 'coc-solargraph',
-  \ 'coc-go'
+  \ 'coc-go',
+  \ 'coc-clangd'
   \ ]
+
+" coc key mapping goto
+" Remap keys for gotos
+nmap <silent> gd <Plug>(coc-definition)
+nmap <silent> gy <Plug>(coc-type-definition)
+nmap <silent> gi <Plug>(coc-implementation)
+nmap <silent> gr <Plug>(coc-references)
+
 
 let g:user_emmet_leader_key=','
 let g:python_host_prog='/usr/bin/python'
@@ -319,8 +343,28 @@ nnoremap <silent> <Space>bw <Cmd>BufferOrderByWindowNumber<CR>
 "set tabline=%!MyTabLine()
 
 lua << EOF
+require('barbar').setup({
+    sidebar_filetypes = {
+        --NerdTree = true,
+    },
+    -- Sets the maximum padding width with which to surround each tab
+    maximum_padding = 5,
+
+    -- Sets the minimum padding width with which to surround each tab
+    minimum_padding = 5,
+
+    -- Sets the maximum buffer name length.
+    maximum_length = 30,
+
+    -- Sets the minimum buffer name length.
+    minimum_length = 0,
+})
+
+
 -- Mappings.
 local opts = { noremap=true, silent=true }
+
+
 
 -- Use an on_attach function to only map the following keys
 -- after the language server attaches to the current buffer
@@ -346,15 +390,15 @@ local on_attach = function(client, bufnr)
 end
 
 -- this part is telling Neovim to use the lsp server
-local servers = { 'pyright', 'tsserver', 'jdtls', 'solargraph' }
-for _, lsp in pairs(servers) do
-    require('lspconfig')[lsp].setup {
-        on_attach = on_attach,
-        flags = {
-          debounce_text_changes = 150,
-        }
-    }
-end
+--local servers = { 'pyright', 'tsserver', 'jdtls', 'solargraph' }
+--for _, lsp in pairs(servers) do
+    --require('lspconfig')[lsp].setup {
+        --on_attach = on_attach,
+        --flags = {
+          --debounce_text_changes = 150,
+        --}
+    --}
+--end
 
 -- this is for diagnositcs signs on the line number column
 -- use this to beautify the plain E W signs to more fun ones
@@ -406,59 +450,5 @@ require("telescope").load_extension "file_browser"
 require("telescope").load_extension "project"
 require("telescope").load_extension "repo"
 
+
 EOF
-
-"lua << EOF
-"require'lspconfig'.solargraph.setup{}
-"require'lsconfig'.tsserver.setup{}
-
-"local nvim_lsp = require('lspconfig')
-
-"-- Use an on_attach function to only map the following keys
-"-- after the language server attaches to the current buffer
-"local on_attach = function(client, bufnr)
-  "local function buf_set_keymap(...) vim.api.nvim_buf_set_keymap(bufnr, ...) end
-  "local function buf_set_option(...) vim.api.nvim_buf_set_option(bufnr, ...) end
-
-  "--Enable completion triggered by <c-x><c-o>
-  "buf_set_option('omnifunc', 'v:lua.vim.lsp.omnifunc')
-
-  "-- Mappings.
-  "local opts = { noremap=true, silent=true }
-
-  "-- See `:help vim.lsp.*` for documentation on any of the below functions
-  "buf_set_keymap('n', 'gD', '<Cmd>lua vim.lsp.buf.declaration()<CR>', opts)
-  "buf_set_keymap('n', 'gd', '<Cmd>lua vim.lsp.buf.definition()<CR>', opts)
-  "buf_set_keymap('n', 'K', '<Cmd>lua vim.lsp.buf.hover()<CR>', opts)
-  "buf_set_keymap('n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<CR>', opts)
-  "buf_set_keymap('n', '<C-k>', '<cmd>lua vim.lsp.buf.signature_help()<CR>', opts)
-  "buf_set_keymap('n', '<space>wa', '<cmd>lua vim.lsp.buf.add_workspace_folder()<CR>', opts)
-  "buf_set_keymap('n', '<space>wr', '<cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>', opts)
-  "buf_set_keymap('n', '<space>wl', '<cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>', opts)
-  "buf_set_keymap('n', '<space>D', '<cmd>lua vim.lsp.buf.type_definition()<CR>', opts)
-  "buf_set_keymap('n', '<space>rn', '<cmd>lua vim.lsp.buf.rename()<CR>', opts)
-  "buf_set_keymap('n', '<space>ca', '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
-  "buf_set_keymap('n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>', opts)
-  "buf_set_keymap('n', '<space>e', '<cmd>lua vim.lsp.diagnostic.show_line_diagnostics()<CR>', opts)
-  "buf_set_keymap('n', '[d', '<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>', opts)
-  "buf_set_keymap('n', ']d', '<cmd>lua vim.lsp.diagnostic.goto_next()<CR>', opts)
-  "buf_set_keymap('n', '<space>q', '<cmd>lua vim.lsp.diagnostic.set_loclist()<CR>', opts)
-  "buf_set_keymap("n", "<space>f", "<cmd>lua vim.lsp.buf.formatting()<CR>", opts)
-
-"end
-
-"-- Use a loop to conveniently call 'setup' on multiple servers and
-"-- map buffer local keybindings when the language server attaches
-"local servers = { "solargraph", "tsserver" }
-"for _, lsp in ipairs(servers) do
-  "nvim_lsp[lsp].setup {
-    "on_attach = on_attach,
-    "flags = {
-      "debounce_text_changes = 150,
-    "}
-"}
-"end
-"require('gitsigns').setup()
-
-"EOF
-"
